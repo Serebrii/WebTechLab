@@ -1,0 +1,121 @@
+﻿@model WebTechLab.Models.Event
+
+@section HeadMeta {
+    <title>@Model.Title</title>
+
+    <meta name="description"
+          content="@(Model.Description.Length > 155 ? Model.Description.Substring(0, 155) + "..." : Model.Description)" />
+
+    <meta property="og:title" content="@Model.Title" />
+    <meta property="og:description"
+          content="@(Model.Description.Length > 155 ? Model.Description.Substring(0, 155) + "..." : Model.Description)" />
+
+    <meta property="og:image" content="@Model.EventPosterUrl" />
+
+    <meta property="og:type" content="website" />
+}
+
+@{
+    // Встановлюємо заголовок вкладки браузера = назві події
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container text-center my-4">
+    <h1 class="display-4 fw-bold">@Html.DisplayFor(model => model.Title)</h1>
+</div>
+
+<div class="container">
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                @if (!string.IsNullOrEmpty(Model.EventPosterUrl))
+                {
+                    <img src="@Model.EventPosterUrl" class="card-img-top" alt="Постер: @Model.Title">
+                }
+                else
+                {
+                    <img src="https://via.placeholder.com/600x800.png?text=Постер+відсутній" class="card-img-top" alt="Постер відсутній">
+                }
+            </div>
+        </div>
+
+        <div class="col-md-8">
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Ключова інформація</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-3"><i class="bi bi-calendar-event"></i> Дата</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.StartTime)</dd>
+
+                        <dt class="col-sm-3"><i class="bi bi-tag"></i> Категорія</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.Category.Name)</dd>
+
+                        <dt class="col-sm-3"><i class="bi bi-geo-alt"></i> Місце</dt>
+                        <dd class="col-sm-9">
+                            @Html.DisplayFor(model => model.Venue.Name)
+                            <br>
+                            <small class="text-muted">@Html.DisplayFor(model => model.Venue.Address)</small>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-geo-alt-fill"></i> На мапі</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="map" style="height: 400px; width: 100%;"></div>
+                </div>
+            </div>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Опис події</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        @Html.DisplayFor(model => model.Description)
+                    </p>
+                </div>
+            </div>
+
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-lg">
+                    <i class="bi bi-pencil-square"></i> Редагувати
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-lg ms-2">
+                    <i class="bi bi-arrow-left"></i> До списку
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // 1. Отримуємо координати з моделі
+            var lat = @(Model.Venue.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            var lon = @(Model.Venue.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture));
+
+            // 2. Ініціалізуємо мапу
+            var map = L.map('map').setView([lat, lon], 15);
+
+            // 3. Додаємо шар "плиток"
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // 4. Додаємо маркер
+            L.marker([lat, lon]).addTo(map)
+                .bindPopup('@Html.Raw(Model.Venue.Name)')
+                .openPopup();
+        });
+    </script>
+}

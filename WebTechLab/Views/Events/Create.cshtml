@@ -1,0 +1,110 @@
+﻿@model WebTechLab.Models.Event
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Event</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EventPosterUrl" class="control-label"></label>
+                <input asp-for="EventPosterUrl" class="form-control" />
+                <span asp-validation-for="EventPosterUrl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StartTime" class="control-label"></label>
+                <input asp-for="StartTime" class="form-control" />
+                <span asp-validation-for="StartTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryId" class="control-label">Категорія (почніть вводити для пошуку)</label>
+
+                <select asp-for="CategoryId" class="form-control" id="categorySelect">
+                    <option></option>
+                </select>
+
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="VenueId" class="control-label">Місце (почніть вводити для пошуку)</label>
+
+                <select asp-for="VenueId" class="form-control" id="venueSelect">
+                    <option></option>
+                </select>
+
+                <span asp-validation-for="VenueId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+
+            // --- Ініціалізація для КАТЕГОРІЇ (вже було) ---
+            $('#categorySelect').select2({
+                placeholder: "Оберіть категорію...",
+                allowClear: true,
+                ajax: {
+                    url: "/api/categoriesapi/search",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { term: params.term };
+                    },
+                    processResults: function (data) {
+                        return { results: data };
+                    }
+                },
+                minimumInputLength: 3
+            });
+
+            // --- НОВИЙ КОД: Ініціалізація для МІСЦЯ (Venue) ---
+            $('#venueSelect').select2({
+                placeholder: "Оберіть місце проведення...",
+                allowClear: true,
+                ajax: {
+                    url: "/api/venuesapi/search", // <-- Змінили URL
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { term: params.term };
+                    },
+                    processResults: function (data) {
+                        return { results: data };
+                    }
+                },
+                minimumInputLength: 3
+            });
+
+        });
+    </script>
+}

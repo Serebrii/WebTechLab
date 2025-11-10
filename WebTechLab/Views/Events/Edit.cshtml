@@ -1,0 +1,117 @@
+﻿@model WebTechLab.Models.Event
+
+@{
+    ViewData["Title"] = "Редагувати подію";
+}
+
+<h1>Редагувати</h1>
+<h4>Подія</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group mb-3">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="EventPosterUrl" class="control-label"></label>
+                <input asp-for="EventPosterUrl" class="form-control" />
+                <span asp-validation-for="EventPosterUrl" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="StartTime" class="control-label"></label>
+                <input asp-for="StartTime" class="form-control" />
+                <span asp-validation-for="StartTime" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="CategoryId" class="control-label">Категорія (почніть вводити для пошуку)</label>
+
+                <select asp-for="CategoryId" class="form-control" id="categorySelect">
+                    @if (Model.Category != null)
+                    {
+                        <option value="@Model.CategoryId" selected>@Model.Category.Name</option>
+                    }
+                </select>
+
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="VenueId" class="control-label">Місце (почніть вводити для пошуку)</label>
+
+                <select asp-for="VenueId" class="form-control" id="venueSelect">
+                    @if (Model.Venue != null)
+                    {
+                        <option value="@Model.VenueId" selected>@Model.Venue.Name</option>
+                    }
+                </select>
+
+                <span asp-validation-for="VenueId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <input type="submit" value="Зберегти" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-outline-secondary">Повернутися до списку</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+
+            // --- Ініціалізація для КАТЕГОРІЇ ---
+            $('#categorySelect').select2({
+                placeholder: "Оберіть категорію...",
+                allowClear: true,
+                ajax: {
+                    url: "/api/categoriesapi/search",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { term: params.term };
+                    },
+                    processResults: function (data) {
+                        return { results: data };
+                    }
+                },
+                minimumInputLength: 3
+            });
+
+            // --- Ініціалізація для МІСЦЯ (Venue) ---
+            $('#venueSelect').select2({
+                placeholder: "Оберіть місце проведення...",
+                allowClear: true,
+                ajax: {
+                    url: "/api/venuesapi/search",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { term: params.term };
+                    },
+                    processResults: function (data) {
+                        return { results: data };
+                    }
+                },
+                minimumInputLength: 3
+            });
+
+        });
+    </script>
+}
