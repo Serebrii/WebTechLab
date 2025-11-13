@@ -17,9 +17,9 @@
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
+                <textarea asp-for="Description" class="form-control" rows="5" id="markdown-editor"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -69,7 +69,6 @@
     <script>
         $(document).ready(function () {
 
-            // --- Ініціалізація для КАТЕГОРІЇ (вже було) ---
             $('#categorySelect').select2({
                 placeholder: "Оберіть категорію...",
                 allowClear: true,
@@ -87,12 +86,11 @@
                 minimumInputLength: 3
             });
 
-            // --- НОВИЙ КОД: Ініціалізація для МІСЦЯ (Venue) ---
             $('#venueSelect').select2({
                 placeholder: "Оберіть місце проведення...",
                 allowClear: true,
                 ajax: {
-                    url: "/api/venuesapi/search", // <-- Змінили URL
+                    url: "/api/venuesapi/search", 
                     dataType: 'json',
                     delay: 250,
                     data: function (params) {
@@ -105,6 +103,18 @@
                 minimumInputLength: 3
             });
 
+        const easyMDE = new EasyMDE({
+            element: document.getElementById('markdown-editor'),
+            spellChecker: false, 
+
+            // Налаштування автозбереження (вимога C12)
+            autosave: {
+                enabled: true,
+                // Унікальний ключ для localStorage.
+                uniqueId: "NewEventDescription",
+                delay: 1000 // Зберігати кожну секунду (1000ms)
+            }
+        });
         });
     </script>
 }

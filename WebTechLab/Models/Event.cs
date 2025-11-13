@@ -19,7 +19,7 @@ namespace WebTechLab.Models
 
         public DateTime StartTime { get; set; } // Час початку
 
-        // --- Зв'язки (Foreign Keys) ---
+        //Зв'язки (Foreign Keys)
 
         // Зв'язок з Категорією
         [Required]

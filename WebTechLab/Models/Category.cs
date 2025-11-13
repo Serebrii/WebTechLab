@@ -10,7 +10,7 @@ namespace WebTechLab.Models
 
         [Required]
         [StringLength(100)]
-        public string Name { get; set; } = string.Empty;// Наприклад: "Музика", "Технології", "Спорт"
+        public string Name { get; set; } = string.Empty;
 
         // Зв'язок: Одна категорія може мати багато подій
         public virtual ICollection<Event>? Events { get; set; }

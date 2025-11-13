@@ -16,7 +16,7 @@
 }
 
 @{
-    // Встановлюємо заголовок вкладки браузера = назві події
+
     ViewData["Title"] = Model.Title;
 }
 
@@ -100,19 +100,19 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            // 1. Отримуємо координати з моделі
+
             var lat = @(Model.Venue.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture));
             var lon = @(Model.Venue.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture));
 
-            // 2. Ініціалізуємо мапу
+
             var map = L.map('map').setView([lat, lon], 15);
 
-            // 3. Додаємо шар "плиток"
+
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-            // 4. Додаємо маркер
+
             L.marker([lat, lon]).addTo(map)
                 .bindPopup('@Html.Raw(Model.Venue.Name)')
                 .openPopup();

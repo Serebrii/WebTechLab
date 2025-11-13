@@ -50,12 +50,12 @@ namespace WebTechLab.Controllers
                 return Ok(new List<object>());
             }
 
-            // Шукаємо в базі категорії, назва яких містить пошуковий запит 'term'
+
             var categories = await _context.Categories
                 .Where(c => c.Name.Contains(term))
                 .ToListAsync();
 
-            // Перетворюємо результат у формат, який очікує Select2: { id: ..., text: ... }
+
             var result = categories.Select(c => new
             {
                 id = c.Id,

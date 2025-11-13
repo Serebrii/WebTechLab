@@ -20,7 +20,7 @@
             </div>
             <div class="form-group mb-3">
                 <label asp-for="Description" class="control-label"></label>
-                <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                <textarea asp-for="Description" class="form-control" rows="5" id="markdown-editor"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
@@ -76,7 +76,7 @@
     <script>
         $(document).ready(function () {
 
-            // --- Ініціалізація для КАТЕГОРІЇ ---
+
             $('#categorySelect').select2({
                 placeholder: "Оберіть категорію...",
                 allowClear: true,
@@ -94,7 +94,7 @@
                 minimumInputLength: 3
             });
 
-            // --- Ініціалізація для МІСЦЯ (Venue) ---
+
             $('#venueSelect').select2({
                 placeholder: "Оберіть місце проведення...",
                 allowClear: true,
@@ -111,6 +111,17 @@
                 },
                 minimumInputLength: 3
             });
+
+        const easyMDE = new EasyMDE({
+            element: document.getElementById('markdown-editor'),
+            spellChecker: false,
+
+            autosave: {
+                enabled: true,
+                uniqueId: "EditEventDescription-" + @Model.Id,
+                delay: 1000
+            }
+        });
 
         });
     </script>

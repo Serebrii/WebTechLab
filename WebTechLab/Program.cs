@@ -5,13 +5,24 @@ using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Отримуємо рядок підключення з appsettings.json
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+string connectionString;
 
-// Реєструємо наш сервіс бази даних (DbContext)
+
+if (builder.Environment.IsEnvironment("Docker"))
+{
+
+    connectionString = builder.Configuration.GetConnectionString("DockerConnection");
+}
+else
+{
+
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+}
+
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
-// Add services to the container.
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

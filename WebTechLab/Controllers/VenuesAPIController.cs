@@ -113,17 +113,16 @@ namespace WebTechLab.Controllers
                 return Ok(new List<object>());
             }
 
-            // Шукаємо місця, назва яких містить пошуковий запит
+
             var venues = await _context.Venues
                 .Where(v => v.Name.Contains(term))
                 .ToListAsync();
 
-            // Перетворюємо у формат, який очікує Select2
+
             var result = venues.Select(v => new
             {
                 id = v.Id,
-                text = v.Name // Ми також можемо додати адресу, наприклад:
-                              // text = $"{v.Name} ({v.Address})"
+                text = v.Name 
             });
 
             return Ok(result);

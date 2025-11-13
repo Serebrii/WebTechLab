@@ -9,11 +9,10 @@ namespace WebTechLab.Models
         public int Id { get; set; }
 
         [Required]
-        public string Name { get; set; } = string.Empty;// Наприклад: "Палац Спорту"
+        public string Name { get; set; } = string.Empty;
 
-        public string Address { get; set; } = string.Empty;// Наприклад: "пл. Спортивна, 1"
+        public string Address { get; set; } = string.Empty;
 
-        // Ось дані для карти (C8)
         public double Latitude { get; set; } // Широта
         public double Longitude { get; set; } // Довгота
 
