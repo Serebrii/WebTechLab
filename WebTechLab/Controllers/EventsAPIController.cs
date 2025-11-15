@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebTechLab.Models;
+using Microsoft.Extensions.Caching.Memory;
+
 
 namespace WebTechLab.Controllers
 {
@@ -14,17 +16,50 @@ namespace WebTechLab.Controllers
     public class EventsAPIController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMemoryCache _cache;
 
-        public EventsAPIController(ApplicationDbContext context)
+        public EventsAPIController(ApplicationDbContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         // GET: api/EventsAPI
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
+        public async Task<ActionResult<object>> GetEvents([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            return await _context.Events.ToListAsync();
+            var totalCount = await _context.Events.CountAsync();
+
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var events = await _context.Events
+                .Include(e => e.Category)
+                .Include(e => e.Venue)
+                .OrderBy(e => e.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var nextLink = (pageNumber < totalPages)
+                ? Url.Action("GetEvents", null, new { pageNumber = pageNumber + 1, pageSize = pageSize }, Request.Scheme)
+                : null;
+
+            var previousLink = (pageNumber > 1)
+                ? Url.Action("GetEvents", null, new { pageNumber = pageNumber - 1, pageSize = pageSize }, Request.Scheme)
+                : null;
+
+            var response = new
+            {
+                totalCount,
+                totalPages,
+                currentPage = pageNumber,
+                currentPageSize = pageSize,
+                nextPageLink = nextLink,
+                previousPageLink = previousLink,
+                data = events
+            };
+
+            return Ok(response);
         }
 
         // GET: api/EventsAPI/5
@@ -97,6 +132,32 @@ namespace WebTechLab.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        // GET: api/EventsAPI/Statistics
+        [HttpGet("Statistics")]
+        public async Task<IActionResult> GetStatistics()
+        {
+            const string cacheKey = "StatisticsData";
+
+            if (!_cache.TryGetValue(cacheKey, out object statisticsData))
+            {
+                statisticsData = await _context.Events
+                    .GroupBy(e => e.Category)
+                    .Select(g => new
+                    {
+                        categoryName = g.Key.Name,
+                        count = g.Count()
+                    })
+                    .ToListAsync();
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+
+                _cache.Set(cacheKey, statisticsData, cacheEntryOptions);
+            }
+
+            return Ok(statisticsData);
         }
 
         private bool EventExists(int id)

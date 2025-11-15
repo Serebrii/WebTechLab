@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebTechLab.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebTechLab.Controllers
 {
+    [Authorize]
     public class EventsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,6 +21,7 @@ namespace WebTechLab.Controllers
         }
 
         // GET: Events
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Events.Include(e => e.Category).Include(e => e.Venue);

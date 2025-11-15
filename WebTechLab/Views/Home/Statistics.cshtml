@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = "Статистика";
+}
+
+<div class="container text-center my-4">
+    <h1 class="display-4 fw-bold">@ViewData["Title"]</h1>
+    <p class="lead text-muted">Події по категоріях</p>
+</div>
+
+<div class="container" style="max-width: 800px;">
+    <canvas id="myChart"></canvas>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            fetch('/api/eventsapi/statistics')
+                .then(response => response.json())
+                .then(data => {
+
+                    const labels = data.map(item => item.categoryName);
+                    const counts = data.map(item => item.count);
+
+                    const ctx = document.getElementById('myChart');
+                    new Chart(ctx, {
+                        type: 'pie', 
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Кількість подій',
+                                data: counts,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.7)',
+                                    'rgba(54, 162, 235, 0.7)',
+                                    'rgba(255, 206, 86, 0.7)',
+                                    'rgba(75, 192, 192, 0.7)',
+                                    'rgba(153, 102, 255, 0.7)',
+                                    'rgba(255, 159, 64, 0.7)'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                        }
+                    });
+                })
+                .catch(error => console.error('Помилка при завантаженні статистики:', error));
+        });
+    </script>
+}
