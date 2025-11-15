@@ -12,30 +12,37 @@ public class EventTests : PageTest
     [Test]
     public async Task ShouldCreateNewEventSuccessfully()
     {
-        await Page.GotoAsync($"{_baseUrl}/events/create");
+        await Page.GotoAsync($"{_baseUrl}/Identity/Account/Login");
 
-        var eventTitle = $"Тестова Подія {DateTime.Now.Ticks}";
+        await Page.GetByLabel("Email").FillAsync("tester@test.com");
+        await Page.GetByLabel("Password", new() { Exact = true }).FillAsync("Password123!");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Log in" }).ClickAsync();
+
+        await Expect(Page).ToHaveURLAsync(new Regex($"{_baseUrl}/$"));
+
+        var eventTitle = $"РўРµСЃС‚РѕРІР° РџРѕРґС–СЏ {DateTime.Now.Ticks}";
+
+        await Page.GotoAsync($"{_baseUrl}/events/create");
 
         await Page.GetByLabel("Title").FillAsync(eventTitle);
         await Page.GetByLabel("EventPosterUrl").FillAsync("https://example.com/image.jpg");
         await Page.GetByLabel("StartTime").FillAsync("2025-12-01T12:00");
 
         await Page.Locator(".EasyMDEContainer .CodeMirror").ClickAsync();
-        await Page.Keyboard.TypeAsync("Це опис з E2E тесту");
-
+        await Page.Keyboard.TypeAsync("Р¦Рµ РѕРїРёСЃ Р· E2E С‚РµСЃС‚Сѓ");
 
         await Page.Locator("#categorySelect + .select2-container").ClickAsync();
-        await Page.GetByRole(AriaRole.Searchbox).FillAsync("Музика");
+        await Page.GetByRole(AriaRole.Searchbox).FillAsync("РњСѓР·РёРєР°");
         await Page.Locator(".select2-results__option--highlighted").ClickAsync();
 
         await Page.Locator("#venueSelect + .select2-container").ClickAsync();
-        await Page.GetByRole(AriaRole.Searchbox).FillAsync("Палац");
+        await Page.GetByRole(AriaRole.Searchbox).FillAsync("РџР°Р»Р°С†");
         await Page.Locator(".select2-results__option--highlighted").ClickAsync();
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Create", Exact = true }).ClickAsync();
 
         await Expect(Page).ToHaveURLAsync(new Regex($"{_baseUrl}/events$", RegexOptions.IgnoreCase));
-
         await Expect(Page.GetByText(eventTitle)).ToBeVisibleAsync();
     }
 }
